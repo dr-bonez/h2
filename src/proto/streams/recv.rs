@@ -8,7 +8,7 @@ use http::{HeaderMap, Request, Response};
 
 use std::io;
 use std::task::{Poll, Waker};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 #[derive(Debug)]
 pub(super) struct Recv {
@@ -864,11 +864,10 @@ impl Recv {
     }
 
     pub fn clear_expired_reset_streams(&mut self, store: &mut Store, counts: &mut Counts) {
-        let now = Instant::now();
-        let reset_duration = self.reset_duration;
+        let _reset_duration = self.reset_duration;
         while let Some(stream) = self.pending_reset_expired.pop_if(store, |stream| {
-            let reset_at = stream.reset_at.expect("reset_at must be set if in queue");
-            now - reset_at > reset_duration
+            let _reset_at = stream.reset_at.expect("reset_at must be set if in queue");
+            false
         }) {
             counts.transition_after(stream, true);
         }

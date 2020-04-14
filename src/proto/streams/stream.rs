@@ -3,6 +3,8 @@ use super::*;
 use std::task::{Context, Waker};
 use std::usize;
 
+use instant::Instant;
+
 /// Tracks Stream related state
 ///
 /// # Reference counting
@@ -90,7 +92,7 @@ pub(super) struct Stream {
     pub is_pending_window_update: bool,
 
     /// The time when this stream may have been locally reset.
-    pub reset_at: Option<()>,
+    pub reset_at: Option<Instant>,
 
     /// Next node in list of reset streams that should expire eventually
     pub next_reset_expire: Option<store::Key>,
@@ -456,7 +458,7 @@ impl store::Next for NextResetExpire {
 
     fn set_queued(stream: &mut Stream, val: bool) {
         if val {
-            stream.reset_at = Some(());
+            stream.reset_at = Some(Instant::now());
         } else {
             stream.reset_at = None;
         }

@@ -51,6 +51,7 @@ log = "0.4.1"
 fnv = "1.0.5"
 slab = "0.4.0"
 indexmap = "1.0"
+instant = { version = "0.1.2", features = ["wasm-bindgen"] }
 
 [dev-dependencies]
 

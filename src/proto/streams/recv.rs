@@ -5,6 +5,7 @@ use crate::{frame, proto};
 use std::task::Context;
 
 use http::{HeaderMap, Request, Response};
+use instant::Instant;
 
 use std::io;
 use std::task::{Poll, Waker};
@@ -864,10 +865,11 @@ impl Recv {
     }
 
     pub fn clear_expired_reset_streams(&mut self, store: &mut Store, counts: &mut Counts) {
-        let _reset_duration = self.reset_duration;
+        let now = Instant::now();
+        let reset_duration = self.reset_duration;
         while let Some(stream) = self.pending_reset_expired.pop_if(store, |stream| {
-            let _reset_at = stream.reset_at.expect("reset_at must be set if in queue");
-            false
+            let reset_at = stream.reset_at.expect("reset_at must be set if in queue");
+            now - reset_at > reset_duration
         }) {
             counts.transition_after(stream, true);
         }
